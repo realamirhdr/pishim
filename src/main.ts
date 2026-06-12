@@ -123,7 +123,11 @@ function makeDodgy(btn: HTMLElement, threshold: number, onThreshold: () => void)
   const MARGIN = 20;
   const THRESHOLD = threshold;
 
-  const orig = btn.getBoundingClientRect();
+  let _orig: DOMRect | null = null;
+  function getOrig(): DOMRect {
+    if (!_orig) _orig = btn.getBoundingClientRect();
+    return _orig;
+  }
   let ox = 0;
   let oy = 0;
   let dodgeCount = 0;
@@ -143,8 +147,9 @@ function makeDodgy(btn: HTMLElement, threshold: number, onThreshold: () => void)
   btn.style.transition = 'transform 0.12s ease-out';
 
   function dodge(clientX: number, clientY: number, speed: number): void {
-    const centerX = orig.left + ox + orig.width / 2;
-    const centerY = orig.top + oy + orig.height / 2;
+    const o = getOrig();
+    const centerX = o.left + ox + o.width / 2;
+    const centerY = o.top + oy + o.height / 2;
     const dx = centerX - clientX;
     const dy = centerY - clientY;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -165,10 +170,10 @@ function makeDodgy(btn: HTMLElement, threshold: number, onThreshold: () => void)
 
     const len = Math.sqrt(fx * fx + fy * fy) || 1;
 
-    const minOx = MARGIN - orig.left;
-    const maxOx = window.innerWidth  - MARGIN - orig.right;
-    const minOy = MARGIN - orig.top;
-    const maxOy = window.innerHeight - MARGIN - orig.bottom;
+    const minOx = MARGIN - o.left;
+    const maxOx = window.innerWidth  - MARGIN - o.right;
+    const minOy = MARGIN - o.top;
+    const maxOy = window.innerHeight - MARGIN - o.bottom;
 
     const prevOx = ox;
     const prevOy = oy;
